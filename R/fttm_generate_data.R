@@ -5,8 +5,8 @@ beta_s <- function(s) {
 
 #' Generate Data for FTTM Option 1
 #'
-#' @param n number of observation
-#' @param m rank of !! SOMETHING
+#' @param n number of participants/sample size
+#' @param m Number of functional time points
 #' @param mu_c censoring times mean
 #' @param seed seed for sampling/data generation
 #'
@@ -54,9 +54,13 @@ fttm_generate_data = function(
   delta <- as.numeric(T_tr < C)
 
   list(
+    n = n,
+    data_scalar = X,
+    data_functional = Xs,
+    functional_domain = S,
     T_obs = T_obs,
     T_true = T_tr,
     C = C,
-    delta = delta,
+    delta = delta
   )
 }

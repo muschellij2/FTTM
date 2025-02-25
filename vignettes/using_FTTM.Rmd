@@ -1,8 +1,8 @@
 ---
-title: "Using FFTM"
+title: "Using The Functional Time Transformation Model"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using FFTM}
+  %\VignetteIndexEntry{Using Functional Time Transformation Model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -23,8 +23,10 @@ library(FTTM)
 This document presents an illustration of the Functional Time Transformation Model (FTTM) developed in Ghosal et al., 2024. 
 
 # Example 1: Functional Cox Model
-First we generate survival times following a functional proportional hazard model (Scenario A1 in paper)and fit the FTTM. 
-```{r, tidy = FALSE,message=FALSE,warning=FALSE, fig.width=6, fig.height=5}
+First we generate survival times following a functional proportional hazard model (Scenario A1 in paper) and fit the FTTM. 
+
+Here we show how to generate simulated data:
+```{r, eval = FALSE}
 ###########Generating data##############################
 set.seed(123)
 n <- 500
@@ -64,9 +66,28 @@ for (i in 1:n)
   T_obs[i] = min(T_tr[i], C[i])
 }
 delta <- as.numeric(T_tr < C)
+```
 
+We have wrapped this function into `FTTM::fttm_generate_data`:
+
+```{r sim_data_tidy}
+sim = fttm_generate_data()
+delta = sim$delta
+T_obs = sim$T_obs
+X = sim$data_scalar
+Xs = sim$data_functional
+S = sim$functional_domain
+n = sim$n
+m = length(S)
+```
+
+```{r, tidy = FALSE,message=FALSE,warning=FALSE, fig.width=6, fig.height=5}
 mean(delta == 1) #proportion uncensored
 mean(delta == 0) #proportion censored
+```
+
+
+```{r, tidy = FALSE,message=FALSE,warning=FALSE, fig.width=6, fig.height=5}
 ###KM estimates#######
 if (requireNamespace("survival", quietly = TRUE)) {
   library(survival)

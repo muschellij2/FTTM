@@ -142,17 +142,17 @@ loglikfun2 <- function(psi, T_obs, delta, Xmat, Xs, S, tau, r, N0, N1)
     N1
   ))
   temp2 <- (1 - delta) * log(S_N_fun(
-    T_obs,
-    beta,
-    gamma,
-    theta,
+    t = T_obs,
+    beta = beta,
+    gamma = gamma,
+    theta = theta,
     Xvec = Xmat,
     Xf = Xs,
-    S,
-    tau,
+    S = S,
+    tau = tau,
     r = r,
-    N0,
-    N1
+    N0 = N0,
+    N1 = N1
   ))
   ll <- temp1 + temp2
   loglikval <- sum(ll)
@@ -173,8 +173,10 @@ loglikfun2 <- function(psi, T_obs, delta, Xmat, Xs, S, tau, r, N0, N1)
 choose.init <- function(T_obs, delta, Xmat, Xs, S, N1) {
   basismat <- NULL
   for (k in 0:N1) {
-    basismat <- cbind(basismat, stats::dbeta((S), shape1 = (k + 1), shape2 = N1 - k +
-                                               1))
+    basismat <- cbind(basismat,
+                      stats::dbeta((S),
+                                   shape1 = (k + 1), shape2 = N1 - k +
+                                     1))
   }
   #basis should add up to 1
   basismat <- (1 / (N1 + 1)) * basismat
@@ -190,22 +192,35 @@ choose.init <- function(T_obs, delta, Xmat, Xs, S, N1) {
 }
 
 
-ICfunc <- function(psiest, N0, N1, r,
-                   p1, T_obs, delta, Xmat, Xs, S, tau)
+ICfunc <- function(psi, N0, N1, r,
+                   T_obs, delta, Xmat, Xs, S, tau)
 {
-  neglval <- 2 * loglikfun2(psiest, T_obs, delta, Xmat, Xs, S, tau, r = r, N0, N1)
+  p1 <- ncol(Xmat)
+  neglval <- 2 * loglikfun2(
+    psi = psi,
+    T_obs = T_obs,
+    delta = delta,
+    Xmat = Xmat,
+    Xs = Xs,
+    S = S,
+    tau = tau,
+    r = r,
+    N0 = N0,
+    N1 = N1)
   AIC <- neglval + 2 * (p1 + N0 + N1 + 1)
   return(AIC)
 }
 
 
 estFTTM.final <- function(Nrvec,
-                          T_obs, delta, Xmat, Xs, S, tau)
+                          T_obs, delta, Xmat, Xs, S, tau,
+                          verbose = TRUE)
 {
   N0 <- as.numeric(Nrvec[1])
   N1 <- as.numeric(Nrvec[2])
   r <- as.numeric(Nrvec[3])
-  initval <- choose.init(T_obs, delta, Xmat, Xs, S, N1 = N1)#N0 not needed here
+  initval <- choose.init(T_obs = T_obs, delta = delta,
+                         Xmat = Xmat, Xs = Xs, S = S, N1 = N1)#N0 not needed here
   if (verbose) {
     print(initval)
   }
@@ -240,7 +255,15 @@ estFTTM.final <- function(Nrvec,
   nH <- Matrix::nearPD(H)$mat
   VCOVpar <- solve(nH)
   SEpar <- sqrt(diag(VCOVpar))
-  AICval <- ICfunc(psiest, N0, N1, r)
+  AICval <- ICfunc(psi = psiest,
+                   N0 = N0,
+                   N1 = N1,
+                   r = r,
+                   Xmat = Xmat,
+                   Xs = Xs,
+                   S = S,
+                   tau = tau
+                   )
   result <- list(
     AICval = AICval,
     psiest = psiest,
