@@ -9,6 +9,7 @@ Authors@R: c(
            comment = c(ORCID = "0000-0001-6469-1750")),
     person("Rahul", "Ghosal", , "rghosal@mailbox.sc.edu", 
     role = c("aut", "cre"))
+    )
 Description: Implements the Functional Time Transformation Model from
   <http://doi.org/10.48550/arXiv.2406.19716>.
 License: GPL (>= 3)
@@ -17,10 +18,13 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Suggests: 
     knitr,
+    mets,
+    refund,
     rmarkdown,
     survival
 VignetteBuilder: knitr
 Imports: 
     Matrix,
     mgcv,
-    stats
+    stats,
+    withr

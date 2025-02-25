@@ -14,6 +14,7 @@ knitr::opts_chunk$set(
   echo = TRUE
 )
 library(mgcv)
+library(FTTM)
 ```
 
 
@@ -123,7 +124,6 @@ time_coxlf <- sort(mod1_func$family$data$tr)
 Next we source the file `sourceFTTM.R` which contains all the required R functions for estimation.
 
 ```{r fig.height=7, fig.width=7, message=FALSE, warning=FALSE, tidy=FALSE}
-source("sourceFTTM.R")
 plot(time_coxlf, est_coxlf_base, type = "l", col = 3)
 ##true baseline survival S(t)=F_epsbar(H(t)), H(t)=beta0+log(t)
 true_H <- beta[1] + log(time_coxlf)
@@ -277,12 +277,14 @@ mod1_func <- gam(
   weights = status
 )
 summary(mod1_func)
-pdf(NULL)
 aa_clf <- plot(mod1_func,
                select = 1,
                ylim = c(-5, 5),
                n = m)
-invisible(dev.off())
+```
+
+
+```{r fig.height=7, fig.width=7, message=FALSE, warning=FALSE, tidy=FALSE}
 betaest_coxlf <- as.numeric(mod1_func$coefficients[1:2])
 betaests_coxlf <- as.numeric(aa_clf[[1]]$fit)
 plot(S,
@@ -291,12 +293,20 @@ plot(S,
      type = "l",
      ylim = c(-5, 5))
 lines(S, betaests_coxlf, col = 3)
+```
+
+
+```{r fig.height=7, fig.width=7, message=FALSE, warning=FALSE, tidy=FALSE}
 #PO model on FPC scores#
 library(refund)
 fpcamod <- fpca.face(Xs, pve = 0.95)
 scoremat <- fpcamod$scores
 k <- ncol(scoremat)
 eigenmat <- fpcamod$efunctions
+```
+
+
+```{r fig.height=7, fig.width=7, message=FALSE, warning=FALSE, tidy=FALSE}
 library(mets)
 newdf$scoremat <- scoremat
 out1 <- logitSurv(Surv(time, status) ~ X1 + X2 + scoremat, data = newdf)
@@ -311,7 +321,6 @@ lines(S, betaests_PO, col = 4)
 Next we apply the proposed FTTM for PO model specification ($r=1$).
 
 ```{r fig.height=7, fig.width=7, message=FALSE, warning=FALSE, tidy=FALSE}
-source("sourceFTTM.R")
 tau <- ceiling(max(T_obs))
 p1 <- ncol(Xmat)
 
