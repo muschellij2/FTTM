@@ -71,7 +71,7 @@ delta <- as.numeric(T_tr < C)
 We have wrapped this function into `FTTM::fttm_generate_data`:
 
 ```{r sim_data_tidy}
-sim = fttm_generate_data()
+sim = fttm_generate_ph_data()
 delta = sim$delta
 T_obs = sim$T_obs
 X = sim$data_scalar
@@ -223,7 +223,7 @@ abline(h = 0)
 # Example 2: Functional PO Model
 Next, we generate survival times following a functional proportional odds model (Scenario A2 in paper)and fit the FTTM. 
 
-```{r, tidy = FALSE,message=FALSE,warning=FALSE, fig.width=6, fig.height=5}
+```{r, eval = FALSE}
 ###########Generating data##############################
 set.seed(1)
 n <- 500
@@ -262,8 +262,25 @@ for (i in 1:n)
   T_obs[i] = min(T_tr[i], C[i])
 }
 delta <- as.numeric(T_tr < C)
+```
+
+
+```{r sim_po_data_tidy}
+sim = fttm_generate_po_data()
+delta = sim$delta
+T_obs = sim$T_obs
+X = sim$data_scalar
+Xs = sim$data_functional
+S = sim$functional_domain
+n = sim$n
+m = length
+
 mean(delta == 1) #proportion uncensored
 mean(delta == 0) #proportion censored
+```
+
+
+```{r, tidy = FALSE,message=FALSE,warning=FALSE, fig.width=6, fig.height=5}
 ###KM estimates#######
 if (requireNamespace("survival", quietly = TRUE)) {
   fitKM <- survfit(Surv(T_obs, delta) ~ 1)###
